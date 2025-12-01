@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bank Manager Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #4B0082;
+      --primary-dark: #2E005F;
+      --bg: #f5f3ff;
+      --card-bg: #ffffff;
+      --border: #dddddd;
+      --text-dark: #222;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-dark);
+    }
+
+    /* NAVBAR - UPDATED */
+    .navbar {
+      background: var(--primary);
+      color: white;
+      padding: 12px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 60px;
+      z-index: 1000;
+      box-sizing: border-box;
+    }
+
+    .navbar .logo {
+      font-size: 22px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Profile section - NEW */
+    .navbar > div:last-child {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      font-size: 15px;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 14px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .navbar > div:last-child:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: linear-gradient(var(--primary-dark), var(--primary));
+      width: 230px;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding-top: 80px;
+      color: white;
+    }
+
+    .sidebar ul { list-style: none; padding: 0; }
+    .sidebar ul li {
+      padding: 15px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: 0.2s;
+    }
+    .sidebar ul li:hover { background: rgba(255,255,255,0.2); }
+
+    /* MAIN CONTENT */
+    .main-content {
+      margin-left: 230px;
+      padding: 100px 30px;
+    }
+
+    h1 { color: var(--primary-dark); margin-bottom: 20px; }
+
+    /* CARDS */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid var(--border);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    th {
+      background: var(--primary);
+      color: white;
+      padding: 12px;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .delete-btn {
+      padding: 8px 16px;
+      background: #dc2626;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .delete-btn:hover { background: #b91c1c; }
+  </style>
+
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo" onclick="location.href='/manager'">
+      <i class="fa fa-building-columns"></i> NOVA BANK
+    </div>
+    <div><i class="fa fa-user-circle"></i> <%= managerName %></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <ul>
+      <li onclick="location.href='/manager'"><i class="fa fa-home"></i> Dashboard</li>
+      <li onclick="location.href='/add-employee-form'"><i class="fa fa-user-plus"></i> Add Employee</li>
+      <li onclick="location.href='/employees'"><i class="fa fa-users"></i> View Employees</li>
+      <li onclick="location.href='/reports'"><i class="fa fa-chart-line"></i> Reports</li>
+      <li onclick="location.href='/logout'"><i class="fa fa-sign-out-alt"></i> Logout</li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <h1>Manager Dashboard</h1>
+
+    <!-- CARDS -->
+    <div class="cards">
+      <div class="card"><h3>Total Employees</h3><p><%= totalEmployees %></p></div>
+      <div class="card"><h3>Total Salary</h3><p>₹<%= totalSalary %></p></div>
+      <div class="card"><h3>Managers</h3><p><%= totalManagers %></p></div>
+      <div class="card"><h3>Cashiers</h3><p><%= totalCashiers %></p></div>
+      <div class="card"><h3>Accountants</h3><p><%= totalAccountants %></p></div>
+      <div class="card"><h3>Clerks</h3><p><%= totalClerks %></p></div>
+      <div class="card"><h3>IT Support</h3><p><%= totalITSupport %></p></div>
+    </div>
+
+    <!-- TABLE -->
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Salary</th>
+        <th>Action</th>
+      </tr>
+
+      <% employees.forEach(emp => { %>
+        <tr id="row-<%= emp.id %>">
+          <td><%= emp.id %></td>
+          <td><%= emp.name %></td>
+          <td><%= emp.username %></td>
+          <td><%= emp.email %></td>
+          <td><%= emp.role %></td>
+          <td>₹<%= emp.salary %></td>
+
+          <td>
+            <button class="delete-btn" onclick="deleteEmp(<%= emp.id %>)">
+              Delete
+            </button>
+          </td>
+        </tr>
+      <% }) %>
+    </table>
+
+  </main>
+
+  <script>
+    function deleteEmp(id) {
+      fetch(`/delete-employee/${id}`, { method: "POST" })
+        .then(() => {
+          document.getElementById(`row-${id}`).remove();
+        })
+        .catch(() => alert("Error deleting employee"));
+    }
+  </script>
+
+</body>
+</html>
