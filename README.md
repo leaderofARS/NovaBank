@@ -6,7 +6,7 @@ It combines a traditional **PostgreSQL** database for fast, efficient banking op
 
 ## 🚀 Features
 
-### 🛡️ Blockchain Security (New!)
+### 🛡️ Blockchain Security
 - **Immutable Audit Trail:** Every transaction (Deposit, Withdraw, Transfer) is cryptographically hashed and stored on the blockchain.
 - **Tamper-Proof History:** Uses **Hash Chaining** (`NewHash = SHA256(Data + PrevHash)`). If a malicious actor alters a record in the SQL database, the cryptographic chain breaks, instantly flagging the corruption.
 - **Role-Based Access Control (RBAC):** Only authorized "Notary" nodes can log transactions to the smart contract.
