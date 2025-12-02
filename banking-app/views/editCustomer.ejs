@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Customer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 45px 50px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 35px;
+      color: #4f46e5;
+      font-size: 32px;
+      font-weight: 600;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 14px 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      text-align: center;
+      font-weight: 500;
+      border-left: 4px solid #dc2626;
+    }
+
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #1f2937;
+      background: #f9fafb;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #6366f1;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    button[type="submit"]:not(.btn-update):not(.btn-delete) {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    button[type="submit"]:not(.btn-update):not(.btn-delete):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    }
+
+    .btn-update {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      margin-top: 10px;
+    }
+
+    .btn-update:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+
+    .btn-delete {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-delete:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 25px;
+      color: #6366f1;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      padding: 10px 20px;
+      border-radius: 8px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .back-link:hover {
+      color: #4f46e5;
+      background: #eef2ff;
+      gap: 12px;
+    }
+
+    .back-link i {
+      font-size: 14px;
+    }
+
+    form {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 35px 25px;
+      }
+
+      h2 {
+        font-size: 26px;
+      }
+
+      label {
+        font-size: 13px;
+      }
+
+      input {
+        font-size: 14px;
+      }
+
+      button {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Edit Customer</h2>
+
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <!-- Search form -->
+    <% if (!customer) { %>
+      <form action="/employee/edit-customer/search" method="POST">
+        <label>Account Number:</label>
+        <input type="text" name="account_no" required />
+
+        <label>Full Name:</label>
+        <input type="text" name="fullname" required />
+
+        <button type="submit"><i class="fa fa-search"></i> Search Customer</button>
+      </form>
+    <% } %>
+
+    <!-- If customer found -->
+    <% if (customer) { %>
+      <form action="/employee/edit-customer/update/<%= customer.customer_id %>" method="POST">
+        <label>Full Name:</label>
+        <input type="text" name="fullname" value="<%= customer.fullname %>" required />
+
+        <label>Address:</label>
+        <input type="text" name="address" value="<%= customer.address %>" required />
+
+        <label>Phone:</label>
+        <input type="text" name="phone" value="<%= customer.phone %>" required />
+
+        <label>Email:</label>
+        <input type="email" name="email" value="<%= customer.email %>" required />
+
+        <button class="btn-update" type="submit"><i class="fa fa-check"></i> Update Customer</button>
+      </form>
+
+      <form action="/employee/edit-customer/delete/<%= customer.customer_id %>" method="POST">
+        <button class="btn-delete" type="submit"><i class="fa fa-trash"></i> Delete Account</button>
+      </form>
+    <% } %>
+
+    <a href="/employee-dashboard" class="back-link">
+      <i class="fa fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+</body>
+</html>

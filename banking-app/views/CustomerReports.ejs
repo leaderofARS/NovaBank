@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customer Reports</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-top: 4px solid #6366f1;
+    }
+
+    h2 {
+      color: #1f2937;
+      margin-bottom: 10px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .header p {
+      color: #6b7280;
+      font-size: 15px;
+    }
+
+    /* TABLE STYLING */
+    .table-wrapper {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: white;
+    }
+
+    th {
+      padding: 18px 20px;
+      text-align: left;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f3f4f6;
+      color: #374151;
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .account-no {
+      font-weight: 600;
+      color: #6366f1;
+      font-family: 'Courier New', monospace;
+    }
+
+    .customer-name {
+      font-weight: 500;
+      color: #1f2937;
+    }
+
+    .balance {
+      font-weight: 700;
+      color: #059669;
+      font-size: 15px;
+    }
+
+    .account-type {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .account-type.savings {
+      background: #dbeafe;
+      color: #0c4a6e;
+    }
+
+    .account-type.current {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .account-type.salary {
+      background: #fef3c7;
+      color: #78350f;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
+    }
+
+    .no-data i {
+      font-size: 48px;
+      color: #d1d5db;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 30px;
+      text-decoration: none;
+      color: #6366f1;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+
+    .back-link:hover {
+      color: #4f46e5;
+      background: #eef2ff;
+      gap: 12px;
+    }
+
+    .back-link i {
+      font-size: 14px;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border-top: 3px solid #6366f1;
+    }
+
+    .stat-card i {
+      font-size: 24px;
+      color: #6366f1;
+      margin-bottom: 10px;
+    }
+
+    .stat-card .number {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .stat-card .label {
+      color: #6b7280;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 8px;
+    }
+
+    .report-card:nth-child(3) i {
+      color: #f59e0b;
+    }
+
+    .report-card:nth-child(3):hover {
+      border-left-color: #f59e0b;
+    @media (max-width: 768px) {
+      .header {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      th, td {
+        padding: 12px 10px;
+      }
+
+      .account-no {
+        font-size: 12px;
+      }
+
+      .account-type {
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h2><i class="fa fa-file-excel"></i> Customer Reports</h2>
+      <p>Complete list of all customers with account details</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <i class="fa fa-users"></i>
+        <div class="number"><%= customers.length %></div>
+        <div class="label">Total Customers</div>
+      </div>
+      <div class="stat-card">
+        <i class="fa fa-wallet"></i>
+        <div class="number">₹<%= totalBalance.toLocaleString('en-IN', {maximumFractionDigits: 0}) %></div>
+        <div class="label">Total Balance</div>
+      </div>
+      <div class="stat-card">
+        <i class="fa fa-layer-group"></i>
+        <div class="number"><%= accountTypes.length %></div>
+        <div class="label">Account Types</div>
+      </div>
+    </div>
+
+    <!-- Customer Table -->
+    <div class="table-wrapper" style="margin-top: 30px;">
+      <% if (customers && customers.length > 0) { %>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th><i class="fa fa-hashtag"></i> Sr No.</th>
+                <th><i class="fa fa-credit-card"></i> Account Number</th>
+                <th><i class="fa fa-user"></i> Customer Name</th>
+                <th><i class="fa fa-wallet"></i> Balance</th>
+                <th><i class="fa fa-building"></i> Account Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% customers.forEach((customer, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td class="account-no"><%= customer.account_no %></td>
+                  <td class="customer-name"><%= customer.fullname %></td>
+                  <td class="balance">₹<%= parseFloat(customer.balance).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
+                  <td>
+                    <span class="account-type <%= customer.account_type ? customer.account_type.toLowerCase() : 'default' %>">
+                      <%= customer.account_type || 'N/A' %>
+                    </span>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="no-data">
+          <i class="fa fa-inbox"></i>
+          <p>No customers found</p>
+        </div>
+      <% } %>
+    </div>
+
+    <a href="/employee-dashboard" class="back-link">
+      <i class="fa fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+</body>
+</html>

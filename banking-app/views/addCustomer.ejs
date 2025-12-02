@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Customer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: #ffffff;
+      padding: 50px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+    
+    h2 {
+      color: #4f46e5;
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    
+    .success-msg {
+      background: #dcfce7;
+      color: #166534;
+      padding: 14px 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      text-align: center;
+      font-weight: 500;
+      border-left: 4px solid #16a34a;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px 35px;
+    }
+    
+    .form-field {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    label {
+      color: #374151;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #1f2937;
+      background: #f9fafb;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #6366f1;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    input::placeholder, textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    select {
+      cursor: pointer;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      grid-column: span 2;
+    }
+    
+    .error-msg {
+      grid-column: span 2;
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 14px 20px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 500;
+      border-left: 4px solid #dc2626;
+    }
+    
+    .form-actions {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    button {
+      padding: 16px 48px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 30px;
+      color: #6366f1;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .back-link:hover {
+      color: #4f46e5;
+      gap: 12px;
+    }
+    
+    .back-link i {
+      font-size: 14px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      textarea {
+        grid-column: span 1;
+      }
+      
+      .error-msg {
+        grid-column: span 1;
+      }
+      
+      .card {
+        padding: 30px 25px;
+      }
+      
+      h2 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <% if (success) { %>
+        <p class="success-msg"><%= success %></p>
+      <% } %>
+
+      <h2>Add New Customer</h2>
+      
+      <form action="/employee/add-customer" method="POST">
+        <div class="form-grid">
+          <div class="form-field">
+            <input type="text" name="fullname" placeholder="Full Name" required>
+          </div>
+          
+          <div class="form-field">
+            <input type="date" name="dob" placeholder="Date of Birth" required>
+          </div>
+
+          <div class="form-field">
+            <input type="text" name="lineage" placeholder="Father/Mother's Name" required>
+          </div>
+          
+          <div class="form-field">
+            <input type="email" name="email" placeholder="Email" required>
+          </div>
+
+          <div class="form-field">
+            <input type="text" name="phone" placeholder="Phone Number" required>
+          </div>
+          
+          <div class="form-field">
+            <input type="text" name="aadhar" placeholder="Aadhar Number" required>
+          </div>
+
+          <textarea name="address" placeholder="Full Address" required></textarea>
+
+          <div class="form-field">
+            <input type="text" name="city" placeholder="City" required>
+          </div>
+
+          <div class="form-field">
+            <input type="text" name="state" placeholder="State" required>
+          </div>
+          
+          <div class="form-field">
+            <input type="number" name="pincode" placeholder="Pincode" required>
+          </div>
+
+          <div class="form-field">
+            <select name="account_type" required>
+              <option value="">-- Select Account Type --</option>
+              <option value="Savings" selected>Savings Account</option>
+              <option value="Current">Current Account</option>
+              <option value="Salary">Salary Account</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <input type="number" name="balance" placeholder="Enter Initial Balance (Min: 500)" min="500" required>
+          </div>
+
+          <% if (error) { %>
+            <p class="error-msg"><%= error %></p>
+          <% } %>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">
+            <i class="fa fa-user-plus"></i> Add Customer
+          </button>
+        </div>
+      </form>
+      
+      <a href="/employee-dashboard" class="back-link">
+        <i class="fa fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
+</body>
+</html>

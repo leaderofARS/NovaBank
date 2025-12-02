@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Employee - NOVA BANK</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #4B0082;
+            --primary-dark: #2E005F;
+            --bg: #f5f3ff;
+            --card-bg: #ffffff;
+            --border: #dddddd;
+            --text-dark: #222;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            z-index: 1000;
+        }
+
+        .navbar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            background: linear-gradient(var(--primary-dark), var(--primary));
+            width: 230px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 80px;
+            color: white;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 15px;
+        }
+
+        .sidebar ul li:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* MAIN */
+        .main-content {
+            margin-left: 230px;
+            padding: 100px 40px;
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 12px;
+            max-width: 1000px; /* reduced from 1200px to 1000px */
+            width: 90%;
+            margin: 0 auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* 2-column layout with better spacing */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px 40px; /* increased gap between columns for wider form */
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(75, 0, 130, 0.1);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            width: 220px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-top: 35px;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(75, 0, 130, 0.3);
+        }
+
+        .btn-wrapper {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 100px 20px;
+                margin-left: 0;
+            }
+            .sidebar {
+                display: none;
+            }
+            .form-card {
+                max-width: 100%;
+                padding: 30px 20px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            .btn-wrapper {
+                justify-content: center;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo" onclick="location.href='/manager'">
+            <i class="fa fa-building-columns"></i> NOVA BANK
+        </div>
+        <div><i class="fa fa-user-circle"></i> Manager Name</div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <ul>
+            <li onclick="location.href='/manager'"><i class="fa fa-home"></i> Dashboard</li>
+            <li onclick="location.href='/add-employee-form'"><i class="fa fa-user-plus"></i> Add Employee</li>
+            <li onclick="location.href='/employees'"><i class="fa fa-users"></i> View Employees</li>
+            <li onclick="location.href='/reports'"><i class="fa fa-chart-line"></i> Reports</li>
+            <li onclick="location.href='/logout'"><i class="fa fa-sign-out-alt"></i> Logout</li>
+        </ul>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <h1>Add New Employee</h1>
+
+        <div class="form-card">
+            <form action="/add-employee" method="POST">
+                <div class="form-grid">
+                    <!-- Row 1: Full Name + Username -->
+                    <div class="form-field">
+                        <label>Full Name</label>
+                        <input type="text" name="name" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Username</label>
+                        <input type="text" name="username" placeholder="Enter username" required>
+                    </div>
+
+                    <!-- Row 2: Email + Role -->
+                    <div class="form-field">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="Enter email address" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Role</label>
+                        <select name="role" required>
+                            <option value="">-- Select Role --</option>
+                            <option>Manager</option>
+                            <option>Cashier</option>
+                            <option>Accountant</option>
+                            <option>Clerk</option>
+                            <option>IT Support</option>
+                        </select>
+                    </div>
+
+                    <!-- Row 3: Salary + Password -->
+                    <div class="form-field">
+                        <label>Salary (₹)</label>
+                        <input type="number" name="salary" placeholder="Enter salary amount" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Password</label>
+                        <input type="password" name="password" placeholder="Enter password" required>
+                    </div>
+                </div>
+
+                <div class="btn-wrapper">
+                    <button type="submit">
+                        <i class="fa fa-user-plus"></i> Add Employee
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>
