@@ -7,9 +7,7 @@ coverage.json
 typechain
 typechain-types
 
-# Hardhat files
-hardhat.config.ts
-hardhat.config.js
+
 
 # Decrypted secrets
 secrets.json
