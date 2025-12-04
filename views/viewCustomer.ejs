@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>View Customer</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -9,26 +10,26 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
       min-height: 100vh;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 40px 20px;
     }
-    
+
     .container {
       max-width: 1100px;
       margin: 0 auto;
     }
-    
+
     .card {
       background: #ffffff;
       padding: 50px;
       border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     }
-    
+
     h2 {
       color: #4f46e5;
       font-size: 32px;
@@ -36,7 +37,7 @@
       margin-bottom: 40px;
       text-align: center;
     }
-    
+
     .error-msg {
       background: #fee2e2;
       color: #991b1b;
@@ -47,25 +48,25 @@
       font-weight: 500;
       border-left: 4px solid #dc2626;
     }
-    
+
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 28px 35px;
     }
-    
+
     .form-field {
       display: flex;
       flex-direction: column;
     }
-    
+
     label {
       color: #374151;
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 8px;
     }
-    
+
     input {
       width: 100%;
       padding: 16px;
@@ -77,25 +78,25 @@
       transition: all 0.3s ease;
       font-family: inherit;
     }
-    
+
     input:focus {
       outline: none;
       border-color: #6366f1;
       background: #ffffff;
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
-    
+
     input::placeholder {
       color: #9ca3af;
     }
-    
+
     .form-actions {
       margin-top: 40px;
       display: flex;
       justify-content: center;
       gap: 15px;
     }
-    
+
     button {
       padding: 16px 48px;
       border: none;
@@ -108,13 +109,13 @@
       transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
-    
+
     button:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
       background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
     }
-    
+
     button:active {
       transform: translateY(0);
     }
@@ -171,7 +172,7 @@
       font-weight: 700;
       font-size: 18px;
     }
-    
+
     .back-link {
       display: inline-flex;
       align-items: center;
@@ -183,26 +184,28 @@
       font-weight: 500;
       transition: all 0.3s ease;
     }
-    
+
     .back-link:hover {
       color: #4f46e5;
       gap: 12px;
     }
-    
+
     .back-link i {
       font-size: 14px;
     }
-    
+
     /* Responsive */
     @media (max-width: 768px) {
-      .form-grid, .details-grid {
+
+      .form-grid,
+      .details-grid {
         grid-template-columns: 1fr;
       }
-      
+
       .card {
         padding: 30px 25px;
       }
-      
+
       h2 {
         font-size: 26px;
       }
@@ -213,105 +216,127 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="card">
       <h2>View Customer</h2>
 
       <% if (error) { %>
-        <p class="error-msg"><%= error %></p>
-      <% } %>
+        <p class="error-msg">
+          <%= error %>
+        </p>
+        <% } %>
 
-      <form action="/employee/view-customer" method="POST">
-        <div class="form-grid">
-          <div class="form-field">
-            <input type="text" name="account_no" placeholder="Account Number" required>
-          </div>
-          
-          <div class="form-field">
-            <input type="text" name="fullname" placeholder="Full Name" required>
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="submit">
-            <i class="fa fa-search"></i> Search Customer
-          </button>
-        </div>
-      </form>
-
-      <% if (customer) { %>
-        <div class="customer-info">
-          <h3><i class="fa fa-user-circle"></i> Customer Details</h3>
-          
-          <div class="details-grid">
-            <div class="detail-item">
-              <span class="detail-label">Account Number</span>
-              <span class="detail-value"><%= customer.account_no %></span>
+          <form action="/employee/view-customer" method="POST">
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+              <div class="form-field">
+                <input type="text" name="account_no" placeholder="Account Number" required>
+              </div>
             </div>
 
-            <div class="detail-item">
-              <span class="detail-label">Full Name</span>
-              <span class="detail-value"><%= customer.fullname %></span>
+            <div class="form-actions">
+              <button type="submit">
+                <i class="fa fa-search"></i> Search Customer
+              </button>
             </div>
+          </form>
 
-            <div class="detail-item">
-              <span class="detail-label">Date of Birth</span>
-              <span class="detail-value"><%= customer.dob.toISOString().split('T')[0] %></span>
-            </div>
+          <% if (customer) { %>
+            <div class="customer-info">
+              <h3><i class="fa fa-user-circle"></i> Customer Details</h3>
 
-            <div class="detail-item">
-              <span class="detail-label">Parent's Name</span>
-              <span class="detail-value"><%= customer.parents_name %></span>
-            </div>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Account Number</span>
+                  <span class="detail-value">
+                    <%= customer.account_no %>
+                  </span>
+                </div>
 
-            <div class="detail-item">
-              <span class="detail-label">Email</span>
-              <span class="detail-value"><%= customer.email %></span>
-            </div>
+                <div class="detail-item">
+                  <span class="detail-label">Full Name</span>
+                  <span class="detail-value">
+                    <%= customer.fullname %>
+                  </span>
+                </div>
 
-            <div class="detail-item">
-              <span class="detail-label">Phone</span>
-              <span class="detail-value"><%= customer.phone %></span>
-            </div>
+                <div class="detail-item">
+                  <span class="detail-label">Date of Birth</span>
+                  <span class="detail-value">
+                    <%= customer.dob.toISOString().split('T')[0] %>
+                  </span>
+                </div>
 
-            <div class="detail-item">
-              <span class="detail-label">Aadhar Number</span>
-              <span class="detail-value"><%= customer.aadhar %></span>
-            </div>
+                <div class="detail-item">
+                  <span class="detail-label">Parent's Name</span>
+                  <span class="detail-value">
+                    <%= customer.parents_name %>
+                  </span>
+                </div>
 
-            <div class="detail-item">
-              <span class="detail-label">City</span>
-              <span class="detail-value"><%= customer.city %></span>
-            </div>
+                <div class="detail-item">
+                  <span class="detail-label">Email</span>
+                  <span class="detail-value">
+                    <%= customer.email %>
+                  </span>
+                </div>
 
-            <div class="detail-item">
-              <span class="detail-label">State</span>
-              <span class="detail-value"><%= customer.state %></span>
-            </div>
+                <div class="detail-item">
+                  <span class="detail-label">Phone</span>
+                  <span class="detail-value">
+                    <%= customer.phone %>
+                  </span>
+                </div>
 
-            <div class="detail-item">
-              <span class="detail-label">Pincode</span>
-              <span class="detail-value"><%= customer.pincode %></span>
-            </div>
+                <div class="detail-item">
+                  <span class="detail-label">Aadhar Number</span>
+                  <span class="detail-value">
+                    <%= customer.aadhar %>
+                  </span>
+                </div>
 
-            <div class="detail-item" style="grid-column: 1 / -1;">
-              <span class="detail-label">Address</span>
-              <span class="detail-value"><%= customer.address %></span>
-            </div>
+                <div class="detail-item">
+                  <span class="detail-label">City</span>
+                  <span class="detail-value">
+                    <%= customer.city %>
+                  </span>
+                </div>
 
-            <div class="detail-item" style="grid-column: 1 / -1; text-align: center;">
-              <span class="detail-label">Account Balance</span>
-              <span class="detail-value balance">₹<%= customer.balance %></span>
+                <div class="detail-item">
+                  <span class="detail-label">State</span>
+                  <span class="detail-value">
+                    <%= customer.state %>
+                  </span>
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Pincode</span>
+                  <span class="detail-value">
+                    <%= customer.pincode %>
+                  </span>
+                </div>
+
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                  <span class="detail-label">Address</span>
+                  <span class="detail-value">
+                    <%= customer.address %>
+                  </span>
+                </div>
+
+                <div class="detail-item" style="grid-column: 1 / -1; text-align: center;">
+                  <span class="detail-label">Account Balance</span>
+                  <span class="detail-value balance">₹<%= customer.balance %></span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      <% } %>
-      
-      <a href="/employee-dashboard" class="back-link">
-        <i class="fa fa-arrow-left"></i> Back to Dashboard
-      </a>
+            <% } %>
+
+              <a href="/employee-dashboard" class="back-link">
+                <i class="fa fa-arrow-left"></i> Back to Dashboard
+              </a>
     </div>
   </div>
 </body>
+
 </html>
