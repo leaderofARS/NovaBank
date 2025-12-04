@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Bank Manager Dashboard</title>
@@ -50,7 +51,7 @@
     }
 
     /* Profile section - NEW */
-    .navbar > div:last-child {
+    .navbar>div:last-child {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -63,7 +64,7 @@
       white-space: nowrap;
     }
 
-    .navbar > div:last-child:hover {
+    .navbar>div:last-child:hover {
       background: rgba(255, 255, 255, 0.25);
     }
 
@@ -79,7 +80,11 @@
       color: white;
     }
 
-    .sidebar ul { list-style: none; padding: 0; }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
     .sidebar ul li {
       padding: 15px 20px;
       cursor: pointer;
@@ -88,7 +93,10 @@
       gap: 12px;
       transition: 0.2s;
     }
-    .sidebar ul li:hover { background: rgba(255,255,255,0.2); }
+
+    .sidebar ul li:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
 
     /* MAIN CONTENT */
     .main-content {
@@ -96,7 +104,10 @@
       padding: 100px 30px;
     }
 
-    h1 { color: var(--primary-dark); margin-bottom: 20px; }
+    h1 {
+      color: var(--primary-dark);
+      margin-bottom: 20px;
+    }
 
     /* CARDS */
     .cards {
@@ -112,7 +123,7 @@
       border-radius: 10px;
       text-align: center;
       border: 1px solid var(--border);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     }
 
     /* TABLE */
@@ -122,7 +133,7 @@
       background: white;
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     }
 
     th {
@@ -146,10 +157,13 @@
       transition: .2s;
     }
 
-    .delete-btn:hover { background: #b91c1c; }
+    .delete-btn:hover {
+      background: #b91c1c;
+    }
   </style>
 
 </head>
+
 <body>
 
   <!-- NAVBAR -->
@@ -157,7 +171,9 @@
     <div class="logo" onclick="location.href='/manager'">
       <i class="fa fa-building-columns"></i> NOVA BANK
     </div>
-    <div><i class="fa fa-user-circle"></i> <%= managerName %></div>
+    <div><i class="fa fa-user-circle"></i>
+      <%= managerName %>
+    </div>
   </div>
 
   <!-- SIDEBAR -->
@@ -176,15 +192,91 @@
 
     <h1>Manager Dashboard</h1>
 
+    <!-- BANK OVERVIEW -->
+    <h2 style="font-size: 18px; margin-bottom: 15px; color: #555;">Bank Overview</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Total Accounts</h3>
+        <p>
+          <%= totalAccounts %>
+        </p>
+        <small style="color: #666;">Active customer accounts</small>
+      </div>
+      <div class="card">
+        <h3>Today's Transactions</h3>
+        <p>
+          <%= todayTransactions %>
+        </p>
+        <small style="color: #666;">Processed transactions today</small>
+      </div>
+      <div class="card">
+        <h3>Flagged Transactions</h3>
+        <p>
+          <%= flaggedTransactions %>
+        </p>
+        <small style="color: #666;">Require immediate attention</small>
+      </div>
+      <div class="card">
+        <h3>Loan Applications</h3>
+        <p>
+          <%= loanApplications %>
+        </p>
+        <small style="color: #666;">Pending review</small>
+      </div>
+      <div class="card">
+        <h3>Total Deposits</h3>
+        <p>
+          <%= totalDeposits %>
+        </p>
+        <small style="color: #666;">Total deposits today</small>
+      </div>
+    </div>
+
+    <h2 style="font-size: 18px; margin-bottom: 15px; color: #555;">Employee Overview</h2>
+
     <!-- CARDS -->
     <div class="cards">
-      <div class="card"><h3>Total Employees</h3><p><%= totalEmployees %></p></div>
-      <div class="card"><h3>Total Salary</h3><p>₹<%= totalSalary %></p></div>
-      <div class="card"><h3>Managers</h3><p><%= totalManagers %></p></div>
-      <div class="card"><h3>Cashiers</h3><p><%= totalCashiers %></p></div>
-      <div class="card"><h3>Accountants</h3><p><%= totalAccountants %></p></div>
-      <div class="card"><h3>Clerks</h3><p><%= totalClerks %></p></div>
-      <div class="card"><h3>IT Support</h3><p><%= totalITSupport %></p></div>
+      <div class="card">
+        <h3>Total Employees</h3>
+        <p>
+          <%= totalEmployees %>
+        </p>
+      </div>
+      <div class="card">
+        <h3>Total Salary</h3>
+        <p>₹<%= totalSalary %>
+        </p>
+      </div>
+      <div class="card">
+        <h3>Managers</h3>
+        <p>
+          <%= totalManagers %>
+        </p>
+      </div>
+      <div class="card">
+        <h3>Cashiers</h3>
+        <p>
+          <%= totalCashiers %>
+        </p>
+      </div>
+      <div class="card">
+        <h3>Accountants</h3>
+        <p>
+          <%= totalAccountants %>
+        </p>
+      </div>
+      <div class="card">
+        <h3>Clerks</h3>
+        <p>
+          <%= totalClerks %>
+        </p>
+      </div>
+      <div class="card">
+        <h3>IT Support</h3>
+        <p>
+          <%= totalITSupport %>
+        </p>
+      </div>
     </div>
 
     <!-- TABLE -->
@@ -199,22 +291,33 @@
         <th>Action</th>
       </tr>
 
-      <% employees.forEach(emp => { %>
+      <% employees.forEach(emp=> { %>
         <tr id="row-<%= emp.id %>">
-          <td><%= emp.id %></td>
-          <td><%= emp.name %></td>
-          <td><%= emp.username %></td>
-          <td><%= emp.email %></td>
-          <td><%= emp.role %></td>
-          <td>₹<%= emp.salary %></td>
+          <td>
+            <%= emp.id %>
+          </td>
+          <td>
+            <%= emp.name %>
+          </td>
+          <td>
+            <%= emp.username %>
+          </td>
+          <td>
+            <%= emp.email %>
+          </td>
+          <td>
+            <%= emp.role %>
+          </td>
+          <td>₹<%= emp.salary %>
+          </td>
 
           <td>
-            <button class="delete-btn" onclick="deleteEmp(<%= emp.id %>)">
+            <button class="delete-btn" onclick="deleteEmp('<%= emp.id %>')">
               Delete
             </button>
           </td>
         </tr>
-      <% }) %>
+        <% }) %>
     </table>
 
   </main>
@@ -230,4 +333,5 @@
   </script>
 
 </body>
+
 </html>
