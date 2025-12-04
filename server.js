@@ -1,9 +1,11 @@
-import express from "express"; 
+import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import session from "express-session";
+import { ethers } from "ethers";
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -20,17 +22,73 @@ app.use(session({
 app.set("view engine", "ejs");
 
 // PostgreSQL connection
-const db = new pg.Client({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DB,
-  password: process.env.PG_PASS,
-  port: process.env.PG_PORT,
+const db = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
+// Test the connection
 db.connect()
-  .then(() => console.log("✅ Connected to PostgreSQL"))
+  .then(client => {
+    console.log("✅ Connected to PostgreSQL");
+    client.release();
+  })
   .catch((err) => console.error("❌ DB connection error:", err));
+
+// Handle unexpected errors on idle clients
+db.on('error', (err, client) => {
+  console.error('❌ Unexpected error on idle client', err);
+});
+
+// ---------------- BLOCKCHAIN SETUP ---------------- //
+const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+// This is a test private key from Hardhat (Account #0)
+const signer = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80", provider);
+
+// Contract Address & ABI (You must update this after deployment!)
+const contractAddress = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
+const contractABI = [
+  "function logTransaction(string memory transactionId, string memory transactionHash) public",
+  "event TransactionLogged(string indexed transactionId, string transactionHash, uint256 timestamp)"
+];
+
+const auditContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+async function logToBlockchain(txnId, data) {
+  try {
+    // Create a SHA-256 hash of the transaction data
+    const dataString = JSON.stringify(data);
+    const hash = crypto.createHash('sha256').update(dataString).digest('hex');
+
+    console.log(`🔗 Logging to Blockchain | ID: ${txnId} | Hash: ${hash}`);
+
+    // 1. SAVE TO LOCAL FILE
+    const fs = await import('fs');
+    const path = await import('path');
+    const logPath = path.join(process.cwd(), 'transaction_hashes.log');
+    const logEntry = `${new Date().toISOString()} | TXN: ${txnId} | Hash: ${hash}\n`;
+
+    fs.appendFile(logPath, logEntry, (err) => {
+      if (err) console.error("❌ Error writing to local log file:", err);
+      else console.log("✅ Hash saved to local file");
+    });
+
+    // 2. SAVE TO SUPABASE DATABASE
+    await db.query("UPDATE transactions SET transaction_hash=$1 WHERE id=$2", [hash, txnId]);
+    console.log("✅ Hash saved to Supabase DB");
+
+    // 3. SEND TO BLOCKCHAIN
+    const tx = await auditContract.logTransaction(txnId.toString(), hash);
+    await tx.wait();
+
+    console.log(`✅ Transaction ${txnId} logged on Blockchain!`);
+  } catch (error) {
+    console.error("❌ Blockchain/Logging Error:", error.message);
+    // Don't crash the app if blockchain fails (it might not be running)
+  }
+}
 
 // Middleware to protect manager routes
 function isAuthenticated(req, res, next) {
@@ -102,34 +160,74 @@ app.get("/logout", (req, res) => {
 // Manager Dashboard
 app.get("/manager", isAuthenticated, async (req, res) => {
   try {
+    // 1. Employee Stats
     const result = await db.query("SELECT * FROM employees_credentials");
-
     const totalEmployees = result.rows.length;
     const totalSalary = result.rows.reduce((sum, e) => sum + Number(e.salary), 0);
-
     const totalManagers = result.rows.filter(e => e.role === "Manager").length;
     const totalCashiers = result.rows.filter(e => e.role === "Cashier").length;
     const totalAccountants = result.rows.filter(e => e.role === "Accountant").length;
     const totalClerks = result.rows.filter(e => e.role === "Clerk").length;
     const totalITSupport = result.rows.filter(e => e.role === "IT Support").length;
 
-    res.render("manager", { 
+    // 2. New Stats (Real-time)
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+
+    // Total Accounts
+    const accountsRes = await db.query("SELECT COUNT(*) FROM customers");
+    const totalAccounts = accountsRes.rows[0].count;
+
+    // Today's Transactions
+    const todayTxRes = await db.query("SELECT COUNT(*) FROM transactions WHERE date >= $1", [startOfDay]);
+    const todayTransactions = todayTxRes.rows[0].count;
+
+    // Flagged Transactions (> 1 Lakh)
+    const flaggedTxRes = await db.query("SELECT COUNT(*) FROM transactions WHERE amount > 100000");
+    const flaggedTransactions = flaggedTxRes.rows[0].count;
+
+    // Loan Applications (Pending)
+    // Note: Ensure 'loans' table exists (created via setup_loans.js)
+    let loanApplications = 0;
+    try {
+      const loansRes = await db.query("SELECT COUNT(*) FROM loans WHERE status = 'Pending'");
+      loanApplications = loansRes.rows[0].count;
+    } catch (e) {
+      console.warn("Loans table might not exist yet:", e.message);
+    }
+
+    // Total Deposits Today
+    const depositsRes = await db.query("SELECT SUM(amount) FROM transactions WHERE type='deposit' AND date >= $1", [startOfDay]);
+    const totalDepositsRaw = depositsRes.rows[0].sum || 0;
+
+    // Format Money Helper
+    function formatMoney(amount) {
+      if (amount >= 1000000) return "₹" + (amount / 1000000).toFixed(1) + "M";
+      if (amount >= 1000) return "₹" + (amount / 1000).toFixed(1) + "K";
+      return "₹" + amount;
+    }
+
+    res.render("manager", {
       employees: result.rows,
       managerName: req.session.managerName,
-
-      // IMPORTANT: Add these for EJS
       totalEmployees,
       totalSalary,
       totalManagers,
       totalCashiers,
       totalAccountants,
       totalClerks,
-      totalITSupport
+      totalITSupport,
+      // New Stats
+      totalAccounts,
+      todayTransactions,
+      flaggedTransactions,
+      loanApplications,
+      totalDeposits: formatMoney(Number(totalDepositsRaw))
     });
 
   } catch (err) {
     console.error(err);
-    res.render("manager", { 
+    res.render("manager", {
       employees: [],
       managerName: req.session.managerName,
       totalEmployees: 0,
@@ -138,7 +236,13 @@ app.get("/manager", isAuthenticated, async (req, res) => {
       totalCashiers: 0,
       totalAccountants: 0,
       totalClerks: 0,
-      totalITSupport: 0
+      totalITSupport: 0,
+      // Defaults
+      totalAccounts: 0,
+      todayTransactions: 0,
+      flaggedTransactions: 0,
+      loanApplications: 0,
+      totalDeposits: "₹0"
     });
   }
 });
@@ -238,13 +342,13 @@ app.get("/reports", isAuthenticated, async (req, res) => {
     const clerks = result.rows.filter(e => e.role === "Clerk").length;
     const itSupport = result.rows.filter(e => e.role === "IT Support").length;
 
-    res.render("reports", { 
-      totalEmployees, totalSalary, managers, cashiers, accountants, clerks, itSupport 
+    res.render("reports", {
+      totalEmployees, totalSalary, managers, cashiers, accountants, clerks, itSupport
     });
   } catch (err) {
     console.error(err);
-    res.render("reports", { 
-      totalEmployees: 0, totalSalary: 0, managers: 0, cashiers: 0, accountants: 0, clerks: 0, itSupport: 0 
+    res.render("reports", {
+      totalEmployees: 0, totalSalary: 0, managers: 0, cashiers: 0, accountants: 0, clerks: 0, itSupport: 0
     });
   }
 });
@@ -258,7 +362,7 @@ app.post("/employee-login", async (req, res) => {
 
   try {
     const result = await db.query(
-      "SELECT * FROM employees_credentials WHERE username=$1", 
+      "SELECT * FROM employees_credentials WHERE username=$1",
       [username.trim()]
     );
 
@@ -292,11 +396,63 @@ app.post("/employee-login", async (req, res) => {
 
 
 // Employee Dashboard
-app.get("/employee-dashboard", isEmployee, (req, res) => {
-  res.render("employeeDashboard", { 
-    employee: req.session.employee,
-    customer: null
-  });
+app.get("/employee-dashboard", isEmployee, async (req, res) => {
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+
+    // Total Accounts
+    const accountsRes = await db.query("SELECT COUNT(*) FROM customers");
+    const totalAccounts = accountsRes.rows[0].count;
+
+    // Today's Transactions
+    const todayTxRes = await db.query("SELECT COUNT(*) FROM transactions WHERE date >= $1", [startOfDay]);
+    const todayTransactions = todayTxRes.rows[0].count;
+
+    // Flagged Transactions (> 1 Lakh)
+    const flaggedTxRes = await db.query("SELECT COUNT(*) FROM transactions WHERE amount > 100000");
+    const flaggedTransactions = flaggedTxRes.rows[0].count;
+
+    // Loan Applications (Pending)
+    let loanApplications = 0;
+    try {
+      const loansRes = await db.query("SELECT COUNT(*) FROM loans WHERE status = 'Pending'");
+      loanApplications = loansRes.rows[0].count;
+    } catch (e) {
+      console.warn("Loans table might not exist yet:", e.message);
+    }
+
+    // Total Deposits Today
+    const depositsRes = await db.query("SELECT SUM(amount) FROM transactions WHERE type='deposit' AND date >= $1", [startOfDay]);
+    const totalDepositsRaw = depositsRes.rows[0].sum || 0;
+
+    function formatMoney(amount) {
+      if (amount >= 1000000) return "₹" + (amount / 1000000).toFixed(1) + "M";
+      if (amount >= 1000) return "₹" + (amount / 1000).toFixed(1) + "K";
+      return "₹" + amount;
+    }
+
+    res.render("employeeDashboard", {
+      employee: req.session.employee,
+      customer: null,
+      totalAccounts,
+      todayTransactions,
+      flaggedTransactions,
+      loanApplications,
+      totalDeposits: formatMoney(Number(totalDepositsRaw))
+    });
+  } catch (err) {
+    console.error("Error fetching employee dashboard stats:", err);
+    res.render("employeeDashboard", {
+      employee: req.session.employee,
+      customer: null,
+      totalAccounts: 0,
+      todayTransactions: 0,
+      flaggedTransactions: 0,
+      loanApplications: 0,
+      totalDeposits: "₹0"
+    });
+  }
 });
 
 
@@ -398,12 +554,12 @@ app.get("/employee/view-customer", isEmployee, (req, res) => {
 
 // Handle search
 app.post("/employee/view-customer", isEmployee, async (req, res) => {
-  const { account_no, fullname } = req.body;
+  const { account_no } = req.body;
 
   try {
     const result = await db.query(
-      "SELECT * FROM customers WHERE account_no=$1 AND fullname ILIKE $2",
-      [account_no, `%${fullname}%`]
+      "SELECT * FROM customers WHERE account_no=$1",
+      [account_no]
     );
 
     if (result.rows.length === 0) {
@@ -569,8 +725,8 @@ app.get("/employee/transactions", isEmployee, async (req, res) => {
     const customersResult = await db.query(
       "SELECT account_no, fullname FROM customers ORDER BY customer_id DESC LIMIT 20"
     );
-    
-    res.render("transactions", { 
+
+    res.render("transactions", {
       employee: req.session.employee,
       result: null,
       error: null,
@@ -578,7 +734,7 @@ app.get("/employee/transactions", isEmployee, async (req, res) => {
     });
   } catch (err) {
     console.error("Error loading transactions page:", err);
-    res.render("transactions", { 
+    res.render("transactions", {
       employee: req.session.employee,
       result: null,
       error: null,
@@ -638,7 +794,7 @@ app.post("/employee/transactions", isEmployee, async (req, res) => {
   }
 
   try {
-    
+
     // ==========================
     // DEPOSIT
     // ==========================
@@ -674,6 +830,15 @@ app.post("/employee/transactions", isEmployee, async (req, res) => {
       );
 
       const transaction = txResult.rows[0];
+
+      // LOG TO BLOCKCHAIN
+      await logToBlockchain(transaction.id, {
+        type: "deposit",
+        account: account_no,
+        amount: amountNum,
+        balance: newBalance,
+        timestamp: transaction.date
+      });
 
       // Prepare result object
       const result = {
@@ -747,6 +912,15 @@ app.post("/employee/transactions", isEmployee, async (req, res) => {
       );
 
       const transaction = txResult.rows[0];
+
+      // LOG TO BLOCKCHAIN
+      await logToBlockchain(transaction.id, {
+        type: "withdraw",
+        account: account_no,
+        amount: amountNum,
+        balance: newBalance,
+        timestamp: transaction.date
+      });
 
       // Prepare result object
       const result = {
@@ -868,6 +1042,17 @@ app.post("/employee/transactions", isEmployee, async (req, res) => {
 
       const transaction = senderTxResult.rows[0];
 
+      // LOG TO BLOCKCHAIN
+      await logToBlockchain(transaction.id, {
+        type: "transfer",
+        from: account_no,
+        to: to_account,
+        amount: amountNum,
+        senderBalance: senderNewBalance,
+        receiverBalance: receiverNewBalance,
+        timestamp: transaction.date
+      });
+
       // Prepare result object
       const result = {
         success: true,
@@ -958,14 +1143,14 @@ app.get("/employee/daily-report", isEmployee, async (req, res) => {
       totalWithdrawals: parseFloat(withdrawalsResult.rows[0].total).toFixed(2)
     };
 
-    res.render("dailyReport", { 
+    res.render("dailyReport", {
       employee: req.session.employee,
-      report: report 
+      report: report
     });
 
   } catch (err) {
     console.error("Daily report error:", err);
-    res.render("dailyReport", { 
+    res.render("dailyReport", {
       employee: req.session.employee,
       report: {
         totalTransactions: 0,
@@ -983,7 +1168,7 @@ app.get("/employee/daily-report", isEmployee, async (req, res) => {
 
 // GET - Show search form
 app.get("/employee/statement", isEmployee, (req, res) => {
-  res.render("statementSearch", { 
+  res.render("statementSearch", {
     employee: req.session.employee,
     error: null
   });
