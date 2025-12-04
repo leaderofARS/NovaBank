@@ -29,3 +29,12 @@ coverage/
 *.swp
 
 .env 
+
+# Local Data & Logs
+transaction_hashes.log
+sql.db
+*.log
+seed_manager.js
+fix_schema.js
+add_hash_column.js
+setup_loans.js
