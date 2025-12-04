@@ -1,50 +1,41 @@
-# 🔗 Blockchain Module
+# NovaBank Blockchain Module 🛡️
 
-This directory contains the **Secure Audit Trail** infrastructure for NovaBank. It uses Ethereum-based Smart Contracts to create an immutable, tamper-proof record of all banking transactions.
+This directory contains the **Ethereum Blockchain** integration for NovaBank. It is responsible for deploying the Smart Contracts that act as the "Digital Notary" for the banking application.
 
-## 🏛️ Architecture
+## 📂 Structure
 
-We use a **Hybrid Architecture**:
-1.  **PostgreSQL**: Stores the actual data (fast, queryable).
-2.  **Blockchain**: Stores a **Cryptographic Hash** of the data (immutable, secure).
+- **`contracts/`**: Contains the Solidity Smart Contracts.
+  - `SecureAuditLog.sol`: The main contract for logging transaction hashes. It includes Role-Based Access Control (RBAC) to ensure only authorized "Notaries" (the backend server) can log data.
+- **`scripts/`**: Deployment scripts.
+  - `deploy_secure.js`: Deploys the `SecureAuditLog` contract to the local Hardhat network.
+- **`hardhat.config.js`**: Configuration for the Hardhat development environment.
 
-### 🔐 Key Components
+## 🚀 Getting Started
 
-#### 1. Smart Contracts (`contracts/`)
-*   **`AuditLog.sol`**: A basic contract to store transaction hashes.
-*   **`SecureAuditLog.sol`** (Recommended): An advanced, enterprise-grade contract featuring:
-    *   **Role-Based Access Control (RBAC)**: Only authorized "Notaries" (your server) can write data.
-    *   **Hash Chaining**: `NewHash = SHA256(Data + PreviousHash)`. This links all transactions for an account together. If one is altered, the chain breaks.
-    *   **Pausable**: Emergency stop mechanism.
+### 1. Install Dependencies
+```bash
+npm install
+```
 
-#### 2. Scripts (`scripts/`)
-*   **`deploy.js`**: Deploys the basic `AuditLog` contract.
-*   **`deploy_secure.js`**: Deploys the `SecureAuditLog` contract.
-
-#### 3. Configuration
-*   **`hardhat.config.js`**: Configures the local blockchain environment (Hardhat Network).
-
-## 🚀 How to Run
-
-### Step 1: Start the Local Blockchain
-Open a terminal in this directory and run:
+### 2. Start Local Blockchain
+Start a local Ethereum node (Hardhat Network):
 ```bash
 npx hardhat node
 ```
-*This starts a simulated Ethereum network on your machine at `http://127.0.0.1:8545`.*
+*Keep this terminal running. It simulates the blockchain network.*
 
-### Step 2: Deploy the Contract
-In a **separate** terminal (while the node is running), deploy the secure contract:
+### 3. Deploy Contract
+In a separate terminal, deploy the smart contract:
 ```bash
 npx hardhat run scripts/deploy_secure.js --network localhost
 ```
 This will:
-1.  Compile the Solidity code.
-2.  Deploy it to your local network.
-3.  Generate a `deployed_secure_contract.json` file in the project root (containing the address and ABI for the backend to use).
+1.  Compile the contracts.
+2.  Deploy `SecureAuditLog` to the local network.
+3.  Generate a `deployed_secure_contract.json` file in this directory, which the main backend server reads to know where to send transactions.
 
-## 🛠️ Tech Stack
-*   **Hardhat**: Development environment.
-*   **Solidity**: Smart contract language.
-*   **Ethers.js**: Library to interact with the blockchain.
-*   **OpenZeppelin**: Industry-standard security libraries.
+## 🧪 Testing
+To run the smart contract tests (if available):
+```bash
+npx hardhat test
+```
